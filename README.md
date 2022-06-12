@@ -16,7 +16,7 @@ Instead of this:
 ```python
 from odoo import models, fields
 
-class ResParter(models.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
 
     friend = fields.Boolean()
@@ -30,7 +30,7 @@ from odoo import fields
 
 from odoo.addons.base.models.res_partner import Partner, ResPartnerIndustry
 
-class ResParter(Partner, extends=True):
+class ResPartner(Partner, extends=True):
     friend: bool = fields.Boolean()
     industry2_id: ResPartnerIndustry = fields.Many2one(string='Additional Industry')
 ```
