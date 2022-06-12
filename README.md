@@ -28,7 +28,7 @@ write this:
 ```python
 from odoo import fields
 
-from odoo.addons.base.models.res_partner import Partner
+from odoo.addons.base.models.res_partner import Partner, ResPartnerIndustry
 
 class ResParter(Partner, extends=True):
     friend: bool = fields.Boolean()
