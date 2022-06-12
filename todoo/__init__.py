@@ -42,6 +42,7 @@ def hook(model):
             # TODO support more field types
             # TODO more type annotation vs field type checks
             # TODO derive Odoo specific field type from type annotation
+            # TODO Optional / required (what to do with null = False in Odoo?)
 
     _orig_new = model.MetaModel.__new__
 
