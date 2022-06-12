@@ -70,8 +70,9 @@ def hook(model):
 
         # TODO support delegation inheritance too ?
         if extends is True:
+            # TODO Merge with existing _inherit field, or error if already set.
             attrs["_inherit"] = list(_inherit(bases))
-            bases = tuple(set(_bases(bases)))
+            bases = tuple(_bases(bases))  # TODO Deduplicate.
 
         _enhance_fields(name, attrs)
 
