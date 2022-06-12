@@ -11,7 +11,9 @@ Towards idiomatic Python with types for Odoo models.
 
 ## Usage
 
-Instead of this:
+`pip install todoo`
+
+Then, you can still write this, as usual:
 
 ```python
 from odoo import models, fields
@@ -27,12 +29,14 @@ class ResPartner(models.Model):
     )
 ```
 
-write this:
+But you can also write this:
 
 ```python
 from odoo import fields
 
-from odoo.addons.base.models.res_partner import Partner, ResPartnerIndustry
+from odoo.addons.base.models.res_partner import (
+    Partner, ResPartnerIndustry
+)
 
 class ResPartner(Partner, extends=True):
     friend: bool = fields.Boolean()
