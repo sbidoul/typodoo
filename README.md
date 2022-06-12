@@ -20,7 +20,7 @@ class ResParter(models.Model):
     _inherit = "res.partner"
 
     friend = fields.Boolean()
-    industry2_id = fields.Many2one('res.partner.industry', 'Additional Industry')
+    industry2_id = fields.Many2one('res.partner.industry', string='Additional Industry')
 ```
 
 write this:
@@ -32,7 +32,7 @@ from odoo.addons.base.models.res_partner import Partner, ResPartnerIndustry
 
 class ResParter(Partner, extends=True):
     friend: bool = fields.Boolean()
-    industry2_id: ResPartnerIndustry = fields.Many2one()
+    industry2_id: ResPartnerIndustry = fields.Many2one(string='Additional Industry')
 ```
 
 ## Why?
