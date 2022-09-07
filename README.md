@@ -46,6 +46,15 @@ class ResPartner(Partner, extends=True):
     )
 ```
 
+But also this:
+
+```python
+from odoo.addons.my_addon.models.res_partner import ResPartner
+
+
+partners: ResPartner = ResPartner(self.env).search([])
+
+```
 ## Why?
 
 Idiomatic python.
