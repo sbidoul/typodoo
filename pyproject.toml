@@ -3,10 +3,10 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "todoo"
-description = ''
+name = "typodoo"
+description = 'Towards idiomatic Python with types for the Odoo ORM'
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [
@@ -15,10 +15,6 @@ authors = [
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.6",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Framework :: Odoo",
 ]
@@ -26,18 +22,17 @@ dependencies = ["wrapt"]
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/todoo#readme"
-Issues = "https://github.com/unknown/todoo/issues"
-Source = "https://github.com/unknown/todoo"
+Documentation = "https://github.com/sbidoul/typodoo#readme"
+Issues = "https://github.com/sbidoul/typodoo/issues"
+Source = "https://github.com/sbidoul/typodoo"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build]
-include = ["_todoo.pth", "todoo/*.py"]
-
-[tool.hatch.build.targets.sdist]
-[tool.hatch.build.targets.wheel]
+include = ["typodoo_activate.pth", "typodoo.py"]
+# TODO add typodoo_activate.pth to editable wheel?
+dev-mode-dirs = ["."]
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -45,7 +40,7 @@ dependencies = [
   "pytest-cov",
 ]
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=todoo --cov=tests"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=typodoo --cov=tests"
 no-cov = "cov --no-cov"
 
 [[tool.hatch.envs.test.matrix]]

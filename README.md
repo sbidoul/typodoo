@@ -1,7 +1,7 @@
-# todoo
+# typodoo
 
-[![PyPI - Version](https://img.shields.io/pypi/v/todoo.svg)](https://pypi.org/project/todoo)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/todoo.svg)](https://pypi.org/project/todoo)
+[![PyPI - Version](https://img.shields.io/pypi/v/typodoo.svg)](https://pypi.org/project/typodoo)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/typodoo.svg)](https://pypi.org/project/typodoo)
 
 -----
 
@@ -11,7 +11,7 @@ Towards idiomatic Python with types for Odoo models.
 
 ## Usage
 
-`pip install todoo`
+`pip install typodoo`
 
 Then, you can still write this, as usual:
 
@@ -52,9 +52,9 @@ But also this:
 from odoo.addons.my_addon.models.res_partner import ResPartner
 
 
-partners: ResPartner = ResPartner(self.env).search([])
-
+partners = ResPartner(self.env).search([])
 ```
+
 ## Why?
 
 Idiomatic python.
@@ -63,6 +63,14 @@ Native auto completion in IDEs.
 
 Static type checking.
 
+## Development
+
+`pip install -e .`
+
+Then, copy `typodoo_activate.pth` to `$VIRTUAL_ENV/lib/python3.10/site-packages`.
+Make this done automatically by the build backend is a TODO.
+
 ## License
 
-`todoo` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`typodoo` is distributed under the terms of the
+[MIT](https://spdx.org/licenses/MIT.html) license.

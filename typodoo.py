@@ -46,7 +46,7 @@ def hook(model):
 
     _orig_new = model.MetaModel.__new__
 
-    def _todoo_new(meta, name, bases, attrs, extends=False):
+    def _typodoo_new(meta, name, bases, attrs, extends=False):
         def _bases(bases):
             for base in bases:
                 if issubclass(base, model.TransientModel):
@@ -73,28 +73,34 @@ def hook(model):
         if extends is True:
             # TODO Merge with existing _inherit field, or error if already set.
             attrs["_inherit"] = list(_inherit(bases))
-            # TODO the _name attribute is not set by the call to _orig_new????
-            # _name is required by the __call__ method in order to be able
-            # to lookup the registry. ATM we take the first base as default
-            attrs["_name"] = attrs["_inherit"][0]
             bases = tuple(_bases(bases))  # TODO Deduplicate.
 
         _enhance_fields(name, attrs)
 
         return _orig_new(meta, name, bases, attrs)
 
-    model.MetaModel.__new__ = _todoo_new
+    model.MetaModel.__new__ = _typodoo_new
 
     _orig_init = model.MetaModel.__init__
 
-    def _todoo_init(self, name, bases, attrs, extends=False):
+    def _typodoo_init(self, name, bases, attrs, extends=False):
         return _orig_init(self, name, bases, attrs)
 
-    model.MetaModel.__init__ = _todoo_init
+    model.MetaModel.__init__ = _typodoo_init
 
-    def todoo_call__(cls, env):
-        """ This method is called at instance creation.
-        """
-        return env[cls._name]
+    _orig_call = model.MetaModel.__call__
 
-    model.MetaModel.__call__ = todoo_call__
+    def _typodoo_call(cls, env, *args):
+        registry_cls = env.registry[cls._name]
+        if cls is registry_cls:
+            # cls is in registry, we likely come from api.Environment.__get_item__
+            # and we want to call the regular constructor.
+            return _orig_call(cls, env, *args)
+        else:
+            # We are instanciating a class that is not in the registry so
+            # the user is likely calling ModelClass(env), so we do the same
+            # as api.Environment.__get_item__.
+            assert not args
+            return registry_cls(env, (), ())
+    
+    model.MetaModel.__call__ = _typodoo_call
