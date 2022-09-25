@@ -73,6 +73,10 @@ def hook(model):
         if extends is True:
             # TODO Merge with existing _inherit field, or error if already set.
             attrs["_inherit"] = list(_inherit(bases))
+            # TODO the _name attribute is not set by the call to _orig_new????
+            # _name is required by the __call__ method in order to be able
+            # to lookup the registry. ATM we take the first base as default
+            attrs["_name"] = attrs["_inherit"][0]
             bases = tuple(_bases(bases))  # TODO Deduplicate.
 
         _enhance_fields(name, attrs)
@@ -87,3 +91,10 @@ def hook(model):
         return _orig_init(self, name, bases, attrs)
 
     model.MetaModel.__init__ = _todoo_init
+
+    def todoo_call__(cls, env):
+        """ This method is called at instance creation.
+        """
+        return env[cls._name]
+
+    model.MetaModel.__call__ = todoo_call__
