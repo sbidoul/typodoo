@@ -5,13 +5,19 @@
 
 -----
 
-Towards idiomatic Python with types for Odoo models ([sildes](https://docs.google.com/presentation/d/1A8UzGnw3TisUjajnPySiHk6E75tEpi7D3zxsHdtjIW4/edit?usp=sharing), [video](https://youtu.be/pAVGpEVORbY)).
+Towards idiomatic Python with types for Odoo models.
+
+This package supports the Odoo Experience 2022 talk ([sildes](https://docs.google.com/presentation/d/1A8UzGnw3TisUjajnPySiHk6E75tEpi7D3zxsHdtjIW4/edit?usp=sharing), [video](https://youtu.be/pAVGpEVORbY)).
+
+It works best when [a few type
+annotations](https://github.com/odoo/odoo/compare/16.0...acsone:odoo:16.0-type-annotations?expand=1)
+are added to the Odoo core.
 
 /!\ This is pre-alpha stuff /!\
 
-## Usage
+## What?
 
-`pip install typodoo`
+`pip install typodoo` to monkey patch the Odoo metaclass on Odoo startup.
 
 Then, you can still write this, as usual:
 
@@ -42,11 +48,10 @@ class ResPartner(Partner):
     friend = fields.Boolean()
     industry2_id = fields.Many2one[ResPartnerIndustry](
         string='Secondary Industry',
-        required=True,
     )
 ```
 
-But also this:
+And also this:
 
 ```python
 from odoo.addons.my_addon.models.res_partner import ResPartner
@@ -68,7 +73,7 @@ Static type checking.
 `pip install -e .`
 
 Then, copy `typodoo_activate.pth` to `$VIRTUAL_ENV/lib/python3.10/site-packages`.
-Make this done automatically by the build backend is a TODO.
+Automating this setup is a TODO.
 
 ## License
 
