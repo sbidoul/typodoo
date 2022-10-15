@@ -5,7 +5,7 @@
 
 -----
 
-Towards idiomatic Python with types for Odoo models.
+Towards idiomatic Python with types for Odoo models ([sildes](https://docs.google.com/presentation/d/1A8UzGnw3TisUjajnPySiHk6E75tEpi7D3zxsHdtjIW4/edit?usp=sharing), [video](https://youtu.be/pAVGpEVORbY)).
 
 /!\ This is pre-alpha stuff /!\
 
