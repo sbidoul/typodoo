@@ -46,7 +46,7 @@ def hook(model):
 
     _orig_new = model.MetaModel.__new__
 
-    def _typodoo_new(meta, name, bases, attrs, extends=False):
+    def _typodoo_new(meta, name, bases, attrs):
         def _bases(bases):
             for base in bases:
                 if issubclass(base, model.TransientModel):
@@ -69,11 +69,31 @@ def hook(model):
                 elif issubclass(base, model.AbstractModel):
                     yield base._name or "base"
 
-        # TODO support delegation inheritance too ?
-        if extends is True:
-            # TODO Merge with existing _inherit field, or error if already set.
-            attrs["_inherit"] = list(_inherit(bases))
-            bases = tuple(_bases(bases))  # TODO Deduplicate.
+        def _extends(bases):
+            """ Check if at least one base is a sub class of BaseModel but not
+            a direct child of BaseModel
+            """
+            for base in bases:
+                if issubclass(
+                    base, model.BaseModel
+                ) and base not in [
+                    model.TransientModel,
+                    model.Model,
+                    model.AbstractModel,
+                ]:
+                    return True
+            return False
+
+        # if '_original_module' is into attrs, the metaclass is called
+        # from the method BaseModel._build_model when the class hierarchy
+        # is build from the graph. We must only take care of the first call
+        # to the metaclass when the original module is imported.
+        if "_original_module" not in attrs:
+            if _extends(bases):
+                # TODO support delegation inheritance too ?
+                # TODO Merge with existing _inherit field, or error if already set.
+                attrs["_inherit"] = list(_inherit(bases))
+                bases = tuple(_bases(bases))  # TODO Deduplicate.
 
         _enhance_fields(name, attrs)
 
@@ -83,7 +103,7 @@ def hook(model):
 
     _orig_init = model.MetaModel.__init__
 
-    def _typodoo_init(self, name, bases, attrs, extends=False):
+    def _typodoo_init(self, name, bases, attrs):
         return _orig_init(self, name, bases, attrs)
 
     model.MetaModel.__init__ = _typodoo_init
@@ -102,5 +122,5 @@ def hook(model):
             # as api.Environment.__get_item__.
             assert not args
             return registry_cls(env, (), ())
-    
+
     model.MetaModel.__call__ = _typodoo_call
