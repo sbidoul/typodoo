@@ -1,14 +1,14 @@
-from odoo import fields, models, api
+from odoo import fields, api
 from odoo.addons.base.models.res_partner import Partner
 
 from .thing import Thing
 
 
-class ResPartner(Partner, extends=True):
+class ResPartner(Partner):
 
-    thing_ids: Thing = fields.One2many(inverse_name="partner_id")
-    thing_count: int = fields.Integer(compute="_compute_thing_count_and_weight")
-    thing_weight: float = fields.Float(compute="_compute_thing_count_and_weight")
+    thing_ids = fields.One2many[Thing](inverse_name="partner_id")
+    thing_count = fields.Integer(compute="_compute_thing_count_and_weight")
+    thing_weight = fields.Float(compute="_compute_thing_count_and_weight")
 
     @api.depends("thing_ids")
     def _compute_thing_count_and_weight(self) -> None:

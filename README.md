@@ -38,9 +38,9 @@ from odoo.addons.base.models.res_partner import (
     Partner, ResPartnerIndustry
 )
 
-class ResPartner(Partner, extends=True):
-    friend: bool = fields.Boolean()
-    industry2_id: ResPartnerIndustry = fields.Many2one(
+class ResPartner(Partner):
+    friend = fields.Boolean()
+    industry2_id = fields.Many2one[ResPartnerIndustry](
         string='Secondary Industry',
         required=True,
     )

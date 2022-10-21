@@ -9,44 +9,9 @@ import wrapt
 def hook(model):
     print("Giving Odoo MetaModel additional super powers.")
 
-    from odoo import fields
-
-    def _enhance_fields(class_name, attrs):
-        annotations = attrs.get("__annotations__")
-        if not annotations:
-            return
-        for name, field in attrs.items():
-            if not isinstance(field, fields.Field):
-                # Not an Odoo field.
-                continue
-            annotation = annotations.get(name)
-            if annotation is None:
-                # No type annotation on field, nothing to add.
-                continue
-            if isinstance(field, fields._Relational):
-                assert issubclass(annotation, model.BaseModel), (
-                    f"Relational field {name!r} of {class_name!r} must be "
-                    f"type annotated with a model class, not {annotation!r}."
-                )
-                field_comodel_name = (
-                    field.args.get("comodel_name") or field.comodel_name
-                )
-                if not field_comodel_name:
-                    field.args["comodel_name"] = annotation._name
-                else:
-                    assert field_comodel_name == annotation._name, (
-                        f"Relational field {name!r} of {class_name!r} "
-                        f"has a comodel_name {field_comodel_name!r} that "
-                        f"does not match its type annotation {annotation!r}."
-                    )
-            # TODO support more field types
-            # TODO more type annotation vs field type checks
-            # TODO derive Odoo specific field type from type annotation
-            # TODO Optional / required (what to do with null = False in Odoo?)
-
     _orig_new = model.MetaModel.__new__
 
-    def _typodoo_new(meta, name, bases, attrs, extends=False):
+    def _typodoo_new(meta, name, bases, attrs):
         def _bases(bases):
             for base in bases:
                 if issubclass(base, model.TransientModel):
@@ -69,13 +34,31 @@ def hook(model):
                 elif issubclass(base, model.AbstractModel):
                     yield base._name or "base"
 
-        # TODO support delegation inheritance too ?
-        if extends is True:
-            # TODO Merge with existing _inherit field, or error if already set.
-            attrs["_inherit"] = list(_inherit(bases))
-            bases = tuple(_bases(bases))  # TODO Deduplicate.
+        def _extends(bases):
+            """ Check if at least one base is a sub class of BaseModel but not
+            a direct child of BaseModel
+            """
+            for base in bases:
+                if issubclass(
+                    base, model.BaseModel
+                ) and base not in [
+                    model.TransientModel,
+                    model.Model,
+                    model.AbstractModel,
+                ]:
+                    return True
+            return False
 
-        _enhance_fields(name, attrs)
+        # if '_original_module' is into attrs, the metaclass is called
+        # from the method BaseModel._build_model when the class hierarchy
+        # is build from the graph. We must only take care of the first call
+        # to the metaclass when the original module is imported.
+        if "_original_module" not in attrs:
+            if _extends(bases):
+                # TODO support delegation inheritance too ?
+                # TODO Merge with existing _inherit field, or error if already set.
+                attrs["_inherit"] = list(_inherit(bases))
+                bases = tuple(_bases(bases))  # TODO Deduplicate.
 
         return _orig_new(meta, name, bases, attrs)
 
@@ -83,7 +66,7 @@ def hook(model):
 
     _orig_init = model.MetaModel.__init__
 
-    def _typodoo_init(self, name, bases, attrs, extends=False):
+    def _typodoo_init(self, name, bases, attrs):
         return _orig_init(self, name, bases, attrs)
 
     model.MetaModel.__init__ = _typodoo_init
@@ -102,5 +85,5 @@ def hook(model):
             # as api.Environment.__get_item__.
             assert not args
             return registry_cls(env, (), ())
-    
+
     model.MetaModel.__call__ = _typodoo_call
