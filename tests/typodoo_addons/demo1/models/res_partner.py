@@ -6,7 +6,7 @@ from .thing import Thing
 
 class ResPartner(Partner):
 
-    thing_ids: Thing = fields.One2many(inverse_name="partner_id")
+    thing_ids = fields.One2many[Thing](inverse_name="partner_id")
     thing_count: int = fields.Integer(compute="_compute_thing_count_and_weight")
     thing_weight: float = fields.Float(compute="_compute_thing_count_and_weight")
 

@@ -9,41 +9,6 @@ import wrapt
 def hook(model):
     print("Giving Odoo MetaModel additional super powers.")
 
-    from odoo import fields
-
-    def _enhance_fields(class_name, attrs):
-        annotations = attrs.get("__annotations__")
-        if not annotations:
-            return
-        for name, field in attrs.items():
-            if not isinstance(field, fields.Field):
-                # Not an Odoo field.
-                continue
-            annotation = annotations.get(name)
-            if annotation is None:
-                # No type annotation on field, nothing to add.
-                continue
-            if isinstance(field, fields._Relational):
-                assert issubclass(annotation, model.BaseModel), (
-                    f"Relational field {name!r} of {class_name!r} must be "
-                    f"type annotated with a model class, not {annotation!r}."
-                )
-                field_comodel_name = (
-                    field.args.get("comodel_name") or field.comodel_name
-                )
-                if not field_comodel_name:
-                    field.args["comodel_name"] = annotation._name
-                else:
-                    assert field_comodel_name == annotation._name, (
-                        f"Relational field {name!r} of {class_name!r} "
-                        f"has a comodel_name {field_comodel_name!r} that "
-                        f"does not match its type annotation {annotation!r}."
-                    )
-            # TODO support more field types
-            # TODO more type annotation vs field type checks
-            # TODO derive Odoo specific field type from type annotation
-            # TODO Optional / required (what to do with null = False in Odoo?)
-
     _orig_new = model.MetaModel.__new__
 
     def _typodoo_new(meta, name, bases, attrs):
@@ -94,8 +59,6 @@ def hook(model):
                 # TODO Merge with existing _inherit field, or error if already set.
                 attrs["_inherit"] = list(_inherit(bases))
                 bases = tuple(_bases(bases))  # TODO Deduplicate.
-
-        _enhance_fields(name, attrs)
 
         return _orig_new(meta, name, bases, attrs)
 
