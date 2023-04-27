@@ -53,7 +53,10 @@ def hook(model):
         # from the method BaseModel._build_model when the class hierarchy
         # is build from the graph. We must only take care of the first call
         # to the metaclass when the original module is imported.
-        if "_original_module" not in attrs:
+        # We must take care of a special case where Odoo define a Mocked
+        # implementation of IrQweb by python inheritance to allows the rendition
+        # of views while no database is selected
+        if "_original_module" not in attrs and name != "MockIrQWeb":
             if _extends(bases):
                 # TODO support delegation inheritance too ?
                 # TODO Merge with existing _inherit field, or error if already set.
@@ -74,6 +77,9 @@ def hook(model):
     _orig_call = model.MetaModel.__call__
 
     def _typodoo_call(cls, env, *args):
+        if not hasattr(env, "registry"):
+            # no DB selected -> no registry initialized
+            return _orig_call(cls, env, *args)
         registry_cls = env.registry[cls._name]
         if cls is registry_cls:
             # cls is in registry, we likely come from api.Environment.__get_item__
