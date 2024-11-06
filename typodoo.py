@@ -89,7 +89,9 @@ def hook(model):
             # We are instanciating a class that is not in the registry so
             # the user is likely calling ModelClass(env), so we do the same
             # as api.Environment.__get_item__.
-            assert not args
-            return registry_cls(env, (), ())
+            # This code could also be called after a registry clean up when
+            # accessing a record already fetched before the cleanup. In this case
+            # the orm will call the method with ids and prefetch_ids into the args
+            return registry_cls(env, *args)
 
     model.MetaModel.__call__ = _typodoo_call
